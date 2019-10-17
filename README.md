@@ -15,7 +15,7 @@
 3 [Системные требования](#system_requirements)  
 3.1 [Функциональные требования](#functional_requirements)  
 3.2 [Нефункциональные требования](#non_functional_requirements)  
-3.2.1 [Атрибуты качества](#quality_attributes) 
+3.2.1 [Атрибуты качества](#quality_attributes)   
 4 [Аналоги](#analogs)
 
 <a name="glossary"/>
