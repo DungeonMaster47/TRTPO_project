@@ -7,9 +7,9 @@
 VK BSUIR schedule bot. Бот будет обладать возможностью предоставлять расписание групп и преподавателей, а также список свободных аудиторий.
 # 2 Требования пользователя 
 ## 2.1 Программные интерфейсы
-[VK api](https://pypi.org/project/vk-api/), [jsonlib](https://docs.python.org/3/library/json.html). Код будет написан на Python 3.6. 
+[VK api](https://pypi.org/project/vk-api/), [jsonlib](https://docs.python.org/3/library/json.html). Код будет написан на Python3. 
 ## 2.2 Интерфейс пользователя
-Текст и графический интерфейс. 
+### 2.2.1 Текст и графический интерфейс. 
 
 Диалог с ботом.
 
