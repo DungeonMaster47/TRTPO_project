@@ -15,7 +15,8 @@
 3 [Системные требования](#system_requirements)  
 3.1 [Функциональные требования](#functional_requirements)  
 3.2 [Нефункциональные требования](#non_functional_requirements)  
-3.2.1 [Атрибуты качества](#quality_attributes)  
+3.2.1 [Атрибуты качества](#quality_attributes) 
+4 [Аналоги](#analogs)
 
 <a name="glossary"/>
 
@@ -80,6 +81,8 @@ VK BSUIR schedule bot. Бот будет обладать возможность
 **3.2.1 Атрибуты качества**
 
 Бот должен работать без сбоев логики и всегда быть доступным для предоставления информации.
+
+<a name="analogs"/>
 
 # 4 Аналоги
 1. [Расписание на сайте БГУИР](https://iis.bsuir.by/schedule).
