@@ -7,9 +7,9 @@
 <a name="1"/>
 
 # 1. Получение расписания группы и свободных аудиторий
-![Диаграмма активностей 1](Diagrams/Images/Sequence1.jpg)
+![Диаграмма активностей 1](/Diagrams/Images/Sequence1.jpg)
 
 <a name="2"/>
 
 # 2. Уведомления
-![Диаграмма активностей 2](Diagrams/Images/Sequence2.jpg)
+![Диаграмма активностей 2](/Diagrams/Images/Sequence2.jpg)
