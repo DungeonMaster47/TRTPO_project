@@ -1,0 +1,40 @@
+{
+    "one_time": true,
+    "buttons": [
+        [{
+            "action": {
+                "type": "text",
+                "label": "Расписание группы",
+                "payload": "{\"button\": \"group_schedule\"}"
+            }
+        }],
+        [{
+            "action": {
+                "type": "text",
+                "label": "Расписание преподавателя",
+                "payload": "{\"button\": \"employee_schedule\"}"
+            }
+        }],
+        [{
+            "action": {
+                "type": "text",
+                "label": "Список свободных аудиторий",
+                "payload": "{\"button\": \"free_auditory_list\"}"
+            }
+        }],
+        [{
+            "action": {
+                "type": "text",
+                "label": "Включить уведомления",
+                "payload": "{\"button\": \"notify_on\"}"
+            }
+        },
+        {
+            "action": {
+                "type": "text",
+                "label": "Выключить уведомления",
+                "payload": "{\"button\": \"notify_off\"}"
+            }
+        }]
+    ]
+}
