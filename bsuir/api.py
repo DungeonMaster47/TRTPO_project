@@ -1,10 +1,23 @@
+import datetime
 import urllib.request
 import urllib.parse
 import json
+import re
 
 
 class BSUIR:
-    def get_group_schedule(self, schedule):
+    @staticmethod
+    def get_group_schedule(group):
+        data = urllib.request.urlopen('https://journal.bsuir.by/api/v1/studentGroup/schedule?' +
+                                      urllib.parse.urlencode({'studentGroup': str(group)}))
+        try:
+            data = json.loads(data.read())
+        except:
+            return None
+        return data
+
+    @staticmethod
+    def group_schedule_to_str(schedule):
         results = ''
         for lesson in schedule:
             fio = ''
@@ -15,19 +28,17 @@ class BSUIR:
             if len(lesson['auditory']) > 0:
                 auditory = lesson['auditory'][0]
 
-            result = lesson['lessonType'] + ' ' \
-                     + lesson['subject'] + ' ' \
-                     + fio + ' ' \
-                     + lesson['startLessonTime'] + '-' \
-                     + lesson['endLessonTime'] + ' ' \
-                     + auditory
+            result = lesson['lessonType'] + ' ' + lesson['subject'] + ' ' + fio + ' ' + lesson[
+                'startLessonTime'] + '-' + \
+                     lesson['endLessonTime'] + ' ' + auditory
 
             results += result + '\n'
 
         return results
 
-    def get_current_group_schedules(self, group):
-        data = urllib.request.urlopen('https://journal.bsuir.by/api/v1/studentGroup/schedule?' + \
+    @classmethod
+    def get_current_group_schedules(cls, group):
+        data = urllib.request.urlopen('https://journal.bsuir.by/api/v1/studentGroup/schedule?' +
                                       urllib.parse.urlencode({'studentGroup': str(group)}))
         try:
             data = json.loads(data.read())
@@ -35,12 +46,13 @@ class BSUIR:
             return 'Ошибка при получении расписания'
 
         result = 'Расписание на сегодня \n' + \
-                 self.get_group_schedule(data["todaySchedules"]) + '\n' + \
+                 cls.group_schedule_to_str(data["todaySchedules"]) + '\n' + \
                  '\nРасписание на завтра' + '\n' + \
-                 self.get_group_schedule(data["tomorrowSchedules"])
+                 cls.group_schedule_to_str(data["tomorrowSchedules"])
         return result
 
-    def get_employee_schedule(self, schedule):
+    @staticmethod
+    def employee_schedule_to_str(schedule):
         results = ''
         for lesson in schedule:
             auditory = ''
@@ -52,36 +64,69 @@ class BSUIR:
                     groups = group
             if len(lesson['studentGroup']) > 1:
                 groups = groups + '-' + str(len(lesson['studentGroup']) - int(groups[-1:]) + 1)
-            result = lesson['lessonType'] + ' ' \
-                     + lesson['subject'] + ' ' \
-                     + groups + ' ' \
-                     + lesson['startLessonTime'] + '-' \
-                     + lesson['endLessonTime'] + ' ' \
-                     + auditory
 
+            result = lesson['lessonType'] + ' ' + lesson['subject'] + ' ' + groups + ' ' + \
+                     lesson['startLessonTime'] + '-' + lesson['endLessonTime'] + ' ' + auditory
             results += result + '\n'
 
         return results
 
-    def get_current_employee_schedules(self, name):
-        name = name.split(sep=' ')
-        if len(name) != 3:
-            return 'Неверный формат имени'
+    @classmethod
+    def get_current_employee_schedules(cls, name: str):
+        # name = name.split(sep=' ')
+        # if len(name) != 3:
+        #     return 'Неверный формат имени'
         employees = urllib.request.urlopen('https://journal.bsuir.by/api/v1/employees')
         employees = json.loads(employees.read())
-        employees = list(
-            filter(lambda x: x['firstName'] == name[1] and x['lastName'] == name[0] and x['middleName'] == name[2],
-                   employees))
+        from datetime import datetime
+        now = datetime.now()
+        employees = list(filter(lambda x: name.lower() in f'{x["lastName"]} {x["firstName"]} {x["middleName"]}'.lower(),
+                                employees))
+
+        print(datetime.now() - now)
         if len(employees) == 0:
             return 'Преподаватель не найден'
         schedule = urllib.request.urlopen(
             'https://journal.bsuir.by/api/v1/portal/employeeSchedule?employeeId=' + str(employees[0]['id']))
         schedule = json.loads(schedule.read())
         result = 'Расписание на сегодня \n' + \
-                 self.get_employee_schedule(schedule["todaySchedules"]) + '\n' + \
+                 cls.employee_schedule_to_str(schedule["todaySchedules"]) + '\n' + \
                  '\nРасписание на завтра' + '\n' + \
-                 self.get_employee_schedule(schedule["tomorrowSchedules"])
+                 cls.employee_schedule_to_str(schedule["tomorrowSchedules"])
         return result
 
-    def get_free_auditory_list(self):
-        return 'Пока нет'
+    @classmethod
+    def get_free_auditory_list(cls):
+        auditories = urllib.request.urlopen('https://journal.bsuir.by/api/v1/auditory')
+        auditories = json.loads(auditories.read())
+        auditories = list(map(lambda x: f'{x["name"]}-{x["buildingNumber"]["name"]}', auditories))
+        auditories = list(filter(lambda x: re.match(r'\d{3}\S{,3}-\d', x) is not None, auditories))
+        groups = urllib.request.urlopen('https://journal.bsuir.by/api/v1/groups')
+        groups = json.loads(groups.read())
+        groups = list(map(lambda x: x['name'], groups))
+        now = datetime.datetime.now()
+        for group in groups:
+            schedule = cls.get_group_schedule(group)
+            if schedule is None:
+                continue
+            schedule = schedule["todaySchedules"]
+            for lesson in schedule:
+                start_time = datetime.datetime(hour=int(lesson["startLessonTime"].split(sep=':')[0]),
+                                               minute=int(lesson["startLessonTime"].split(sep=':')[1]),
+                                               second=0,
+                                               day=now.day,
+                                               month=now.month,
+                                               year=now.year,
+                                               )
+                end_time = datetime.datetime(hour=int(lesson["endLessonTime"].split(sep=':')[0]),
+                                             minute=int(lesson["endLessonTime"].split(sep=':')[1]),
+                                             second=0,
+                                             day=now.day,
+                                             month=now.month,
+                                             year=now.year,
+                                             )
+                if start_time <= now <= end_time:
+                    if len(lesson["auditory"]) > 0:
+                        auditories.remove(lesson["auditory"][0])
+                    break
+        return auditories

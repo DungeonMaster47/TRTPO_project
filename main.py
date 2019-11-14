@@ -1,8 +1,16 @@
+import requests
+
 from bsuir.api import BSUIR
 from bot.bot import Bot
 
-bot = Bot('b6c76b3f6f6e89a3af32669501b94227035a989823e626963eda64ca13d39cfd8ae9c11b3c04ee1c03758')
-bot.run()
+if __name__ == '__main__':
+    bot = Bot('b6c76b3f6f6e89a3af32669501b94227035a989823e626963eda64ca13d39cfd8ae9c11b3c04ee1c03758')
+    while True:
+        try:
+            bot.run()
+        except requests.exceptions.ReadTimeout:
+            print("restoring connection")
+            # bot = Bot('b6c76b3f6f6e89a3af32669501b94227035a989823e626963eda64ca13d39cfd8ae9c11b3c04ee1c03758')
 
 
 '''
