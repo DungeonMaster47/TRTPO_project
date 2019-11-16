@@ -32,12 +32,32 @@ class Bot:
         try:
             with open('users.json', 'r') as file:
                 try:
-                    self.users = json.load(file)
+                    users = json.loads(file.read())
+                    self.users = {}
+                    for user_id, user_info in users.items():
+                        user_id = int(user_id)
+                        self.users[user_id] = self.UserInfo()
+                        self.users[user_id].group = user_info['group']
+                        self.users[user_id].state = user_info['state']
+                        self.users[user_id].notify = user_info['notify']
                 except Exception:
                     self.users = {}
         except FileNotFoundError:
             self.users = {}
         self.notify_time = datetime.datetime.now()
+
+    def save_users(self):
+        with open('users.json', 'w') as file:
+            try:
+                users = {}
+                for user_id, user_info in self.users.items():
+                    users[user_id] = {}
+                    users[user_id]['group'] = user_info.group
+                    users[user_id]['state'] = user_info.state
+                    users[user_id]['notify'] = user_info.notify
+                file.write(json.dumps(users))
+            except Exception:
+                pass
 
     def run(self):
         vk_session = vk_api.VkApi(token=self.token)
@@ -81,6 +101,7 @@ class Bot:
                                         random_id=random.getrandbits(64)
                                     )
                                     self.users[event.user_id].state = self.UserInfo.GROUP_INPUT_STATE
+                                    self.save_users()
 
                                 elif event.text == 'Расписание преподавателя':
                                     vk.messages.send(
@@ -89,6 +110,7 @@ class Bot:
                                         random_id=random.getrandbits(64)
                                     )
                                     self.users[event.user_id].state = self.UserInfo.EMPLOYEE_INPUT_STATE
+                                    self.save_users()
 
                                 elif event.text == 'Список свободных аудиторий':
                                     vk.messages.send(
@@ -110,6 +132,7 @@ class Bot:
                                         random_id=random.getrandbits(64)
                                     )
                                     self.users[event.user_id].state = self.UserInfo.NOTIFY_GROUP_INPUT_STATE
+                                    self.save_users()
 
                                 elif event.text == 'Выключить уведомления':
                                     vk.messages.send(
@@ -120,6 +143,7 @@ class Bot:
                                     )
                                     self.users[event.user_id].notify = False
                                     self.users[event.user_id].state = self.UserInfo.INIT_STATE
+                                    self.save_users()
 
                                 else:
                                     vk.messages.send(
@@ -137,6 +161,7 @@ class Bot:
                                     keyboard=self.keyboard
                                 )
                                 self.users[event.user_id].state = self.UserInfo.INIT_STATE
+                                self.save_users()
 
                             elif self.users[event.user_id].state == self.UserInfo.EMPLOYEE_INPUT_STATE:
                                 vk.messages.send(
@@ -146,6 +171,7 @@ class Bot:
                                     keyboard=self.keyboard
                                 )
                                 self.users[event.user_id].state = self.UserInfo.INIT_STATE
+                                self.save_users()
 
                             elif self.users[event.user_id].state == self.UserInfo.NOTIFY_GROUP_INPUT_STATE:
                                 if self.bsuir_api.get_current_group_schedules(
@@ -157,6 +183,7 @@ class Bot:
                                         keyboard=self.keyboard
                                     )
                                     self.users[event.user_id].state = self.UserInfo.INIT_STATE
+                                    self.save_users()
 
                                 else:
                                     vk.messages.send(
@@ -168,6 +195,7 @@ class Bot:
                                     self.users[event.user_id].group = event.text
                                     self.users[event.user_id].notify = True
                                     self.users[event.user_id].state = self.UserInfo.INIT_STATE
+                                    self.save_users()
 
                         else:
                             self.users[event.user_id] = self.UserInfo()
@@ -177,8 +205,4 @@ class Bot:
                                 random_id=random.getrandbits(64),
                                 keyboard=self.keyboard
                             )
-                            with open('users.json', 'w') as file:
-                                try:
-                                    json.dump(file, self.users)
-                                except Exception:
-                                    pass
+                            self.save_users()
