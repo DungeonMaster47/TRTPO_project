@@ -1,9 +1,7 @@
+# -*- coding: utf-8 -*-
 from time import sleep
-
-import requests
-
-from bsuir.api import BSUIR
 from bot.bot import Bot
+
 
 if __name__ == '__main__':
     bot = Bot('154e00683e8ab940c179f50c4f04a4ebfd9da709bcdd355e002a88095aac0a80cf26312d1c016acf3697d')
