@@ -79,11 +79,11 @@ class BSUIR:
         #     return 'Неверный формат имени'
         employees = urllib.request.urlopen('https://journal.bsuir.by/api/v1/employees')
         employees = json.loads(employees.read())
-        now = datetime.datetime.now(tz=datetime.timezone(3))
+        now = datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=3)))
         employees = list(filter(lambda x: name.lower() in f'{x["lastName"]} {x["firstName"]} {x["middleName"]}'.lower(),
                                 employees))
 
-        print(datetime.datetime.now(tz=datetime.timezone(3)) - now)
+        print(datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=3))) - now)
         if len(employees) == 0:
             return 'Преподаватель не найден'
         schedule = urllib.request.urlopen(
@@ -104,7 +104,7 @@ class BSUIR:
         groups = urllib.request.urlopen('https://journal.bsuir.by/api/v1/groups')
         groups = json.loads(groups.read())
         groups = list(map(lambda x: x['name'], groups))
-        now = datetime.datetime.now(tz=datetime.timezone(3))
+        now = datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=3)))
         for group in groups:
             schedule = cls.get_group_schedule(group)
             if schedule is None:

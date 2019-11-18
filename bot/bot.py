@@ -30,7 +30,7 @@ class Bot:
         self.bsuir_api = BSUIR()
         self.keyboard = open("bot/KB.json", "r").read()
         self.users = self.__load_users()
-        self.notify_time = datetime.datetime.now(tz=datetime.timezone(3))
+        self.notify_time = datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=3)))
         self.vk = None
         self.handlers = {self.UserInfo.INIT_STATE: self.__menu_handler,
                          self.UserInfo.GROUP_INPUT_STATE: self.__group_schedule_request_input,
@@ -71,11 +71,11 @@ class Bot:
         return users
 
     def __notify(self):
-        if (datetime.datetime.now(tz=datetime.timezone(3)) - self.notify_time).seconds / 60 >= 3:
+        if (datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=3))) - self.notify_time).seconds / 60 >= 3:
             for user_id, user_info in self.users.items():
                 if user_info.notify:
                     schedule = self.bsuir_api.get_group_schedule(user_info.group)
-                    now = datetime.datetime.now(tz=datetime.timezone(3))
+                    now = datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=3)))
                     for lesson in schedule['todaySchedules']:
 
                         start_lesson_time = datetime.datetime(
@@ -93,7 +93,7 @@ class Bot:
                                 message='Скоро пара' + ' ' + lesson['lessonType'] + ' ' + lesson['subject'],
                                 random_id=random.getrandbits(64)
                             )
-            self.notify_time = datetime.datetime.now(tz=datetime.timezone(3))
+            self.notify_time = datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=3)))
 
     def __event_handler(self, event: vk_api.longpoll.Event):
         if event.type == VkEventType.MESSAGE_NEW and event.to_me and event.text and event.from_user:
