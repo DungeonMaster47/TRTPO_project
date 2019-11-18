@@ -8,11 +8,12 @@ import re
 class BSUIR:
     @staticmethod
     def get_group_schedule(group):
-        data = urllib.request.urlopen('https://journal.bsuir.by/api/v1/studentGroup/schedule?' +
-                                      urllib.parse.urlencode({'studentGroup': str(group)}))
+        data = urllib.request.urlopen(
+            'https://journal.bsuir.by/api/v1/studentGroup/schedule?' +
+            urllib.parse.urlencode({'studentGroup': str(group)}))
         try:
             data = json.loads(data.read())
-        except:
+        except Exception:
             return None
         return data
 
@@ -42,7 +43,7 @@ class BSUIR:
                                       urllib.parse.urlencode({'studentGroup': str(group)}))
         try:
             data = json.loads(data.read())
-        except:
+        except Exception:
             return 'Ошибка при получении расписания'
 
         result = 'Расписание на сегодня \n' + \
@@ -78,12 +79,11 @@ class BSUIR:
         #     return 'Неверный формат имени'
         employees = urllib.request.urlopen('https://journal.bsuir.by/api/v1/employees')
         employees = json.loads(employees.read())
-        from datetime import datetime
-        now = datetime.now()
+        now = datetime.datetime.now(tz=datetime.timezone(3))
         employees = list(filter(lambda x: name.lower() in f'{x["lastName"]} {x["firstName"]} {x["middleName"]}'.lower(),
                                 employees))
 
-        print(datetime.now() - now)
+        print(datetime.datetime.now(tz=datetime.timezone(3)) - now)
         if len(employees) == 0:
             return 'Преподаватель не найден'
         schedule = urllib.request.urlopen(
@@ -104,7 +104,7 @@ class BSUIR:
         groups = urllib.request.urlopen('https://journal.bsuir.by/api/v1/groups')
         groups = json.loads(groups.read())
         groups = list(map(lambda x: x['name'], groups))
-        now = datetime.datetime.now()
+        now = datetime.datetime.now(tz=datetime.timezone(3))
         for group in groups:
             schedule = cls.get_group_schedule(group)
             if schedule is None:
@@ -129,4 +129,5 @@ class BSUIR:
                     if len(lesson["auditory"]) > 0:
                         auditories.remove(lesson["auditory"][0])
                     break
+        auditories.sort()
         return auditories
