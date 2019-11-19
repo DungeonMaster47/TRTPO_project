@@ -117,6 +117,7 @@ class BSUIR:
                                                day=now.day,
                                                month=now.month,
                                                year=now.year,
+                                               tzinfo=datetime.timezone(datetime.timedelta(hours=3))
                                                )
                 end_time = datetime.datetime(hour=int(lesson["endLessonTime"].split(sep=':')[0]),
                                              minute=int(lesson["endLessonTime"].split(sep=':')[1]),
@@ -124,6 +125,7 @@ class BSUIR:
                                              day=now.day,
                                              month=now.month,
                                              year=now.year,
+                                             tzinfo=datetime.timezone(datetime.timedelta(hours=3))
                                              )
                 if start_time <= now <= end_time:
                     if len(lesson["auditory"]) > 0:

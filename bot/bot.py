@@ -84,7 +84,8 @@ class Bot:
                             second=0,
                             year=now.year,
                             month=now.month,
-                            day=now.day
+                            day=now.day,
+                            tzinfo=datetime.timezone(datetime.timedelta(hours=3))
                         )
                         time_before_lesson = (start_lesson_time - now).seconds / 60
                         if 5 >= time_before_lesson > 0:

@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
+import datetime
 from time import sleep
 from bot.bot import Bot
 
 
 if __name__ == '__main__':
     bot = Bot('154e00683e8ab940c179f50c4f04a4ebfd9da709bcdd355e002a88095aac0a80cf26312d1c016acf3697d')
+    print(datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=3))))
     while True:
         try:
             bot.run()
-        except Exception:
-            print("restoring connection")
+        except Exception as e:
+            print(f'"restoring connection", {datetime.datetime.now()}')
             sleep(5)
 
 
