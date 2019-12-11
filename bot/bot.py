@@ -29,8 +29,10 @@ class Bot:
         self.token = token
         self.bsuir_api = BSUIR()
         self.keyboard = open("bot/KB.json", "r").read()
+        self.keyboardJSON = json.loads(self.keyboard)
         self.users = self.__load_users()
         self.notify_time = datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=3)))
+        self.notify_cd = datetime.timedelta(minutes=0)
         self.vk = None
         self.handlers = {self.UserInfo.INIT_STATE: self.__menu_handler,
                          self.UserInfo.GROUP_INPUT_STATE: self.__group_schedule_request_input,
@@ -72,6 +74,7 @@ class Bot:
 
     def __notify(self):
         if (datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=3))) - self.notify_time).seconds / 60 >= 3:
+            self.notify_cd = datetime.timedelta(minutes=0)
             for user_id, user_info in self.users.items():
                 if user_info.notify:
                     schedule = self.bsuir_api.get_group_schedule(user_info.group)
@@ -94,6 +97,7 @@ class Bot:
                                 message='Скоро пара' + ' ' + lesson['lessonType'] + ' ' + lesson['subject'],
                                 random_id=random.getrandbits(64)
                             )
+                            self.notify_cd = datetime.timedelta(minutes=5)
             self.notify_time = datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=3)))
 
     def __event_handler(self, event: vk_api.longpoll.Event):
@@ -106,7 +110,10 @@ class Bot:
                 self.__invalid_request(event)
 
     def __menu_handler(self, event: vk_api.longpoll.Event):
-        self.menu_handlers[event.text.lower()](event)
+        if hasattr(event, 'payload'):
+            self.menu_handlers[event.text.lower()](event)
+        else:
+            self.__invalid_request(event)
 
     def __group_schedule_request(self, event: vk_api.longpoll.Event):
         self.vk.messages.send(
